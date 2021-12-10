@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 import { createRequire } from 'module';
 import * as path from 'path';
-import typescript from 'typescript';
+import type typescript from 'typescript';
 import winston from 'winston';
 
 const logger = winston.createLogger({
@@ -16,6 +16,8 @@ const logger = winston.createLogger({
   handleExceptions: true,
 });
 
+const startTime = process.hrtime();
+
 const projectFileEnv = process.env['TSCONFIG'];
 if (!projectFileEnv) {
   throw new Error(`TSCONFIG env not found.`);
@@ -27,6 +29,14 @@ if (!fs.existsSync(projectFile)) {
 }
 
 logger.info(`Using project file: ${projectFile}`);
+
+let extraConfig: typescript.ParsedCommandLine['options'] = {};
+const extraConfigEnv = process.env['EXTRA_CONFIG'];
+if (extraConfigEnv) {
+  extraConfig = JSON.parse(extraConfigEnv);
+}
+
+logger.info(`Using extra config: ${JSON.stringify(extraConfig)}`);
 
 const outputFileEnv = process.env['OUTPUT'];
 if (!outputFileEnv) {
@@ -51,18 +61,14 @@ const config = ts.parseJsonConfigFileContent(
   path.basename(projectFile),
 );
 
-const extraConfiguration: typescript.ParsedCommandLine['options'] = {
-  skipLibCheck: true,
-  noImplicitAny: true,
-};
+config.options = { ...config.options, sourceMap: false, emitDecoratorMetadata: false, ...extraConfig };
 
-logger.info(`Using extra configuration: ${JSON.stringify(extraConfiguration)}`);
-config.options = { ...config.options, ...extraConfiguration };
-
-const createdFiles: Record<string, string> = {};
 const host = ts.createCompilerHost(config.options);
 logger.info(`Using in-memory compilation`);
-host.writeFile = (fileName: string, contents: string) => (createdFiles[fileName] = contents);
+
+host.writeFile = (fileName: string, _ignoredResult: string) => {
+  logger.info(`Compiled file: ${fileName}`);
+};
 
 const program = ts.createProgram({
   rootNames: config.fileNames,
@@ -72,8 +78,8 @@ const program = ts.createProgram({
   host,
 });
 
+logger.info(`Compiling...`);
 const emitResult = program.emit();
-logger.info(`Emitting result`);
 const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
 const relevantDiagnostics = allDiagnostics.filter(({ file }) => {
@@ -103,3 +109,7 @@ diagnostics.forEach((diag) => {
 
 logger.info(`Writing output file: ${outputFile}`);
 fs.writeFileSync(outputFile, JSON.stringify(json, null, 2));
+
+const [totalSeconds, totalNanoSeconds] = process.hrtime(startTime);
+
+logger.info(`Took ${totalSeconds}.${totalNanoSeconds / 1000000} seconds: ${outputFile}`);
