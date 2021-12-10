@@ -10,9 +10,7 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   defaultMeta: { service: 'typescript_errors' },
-  transports: [
-    new winston.transports.Console({ format: winston.format.simple()),
-  ],
+  transports: [new winston.transports.Console({ format: winston.format.simple() })],
 });
 
 const projectFileEnv = process.env['TSCONFIG'];
@@ -21,7 +19,7 @@ if (!projectFileEnv) {
 }
 
 const projectFile = path.resolve(projectFileEnv);
-if(!fs.existsSync(projectFile)) {
+if (!fs.existsSync(projectFile)) {
   throw new Error(`Project file not found: ${projectFile}`);
 }
 
@@ -52,11 +50,11 @@ const config = ts.parseJsonConfigFileContent(
 
 const extraConfiguration: typescript.ParsedCommandLine['options'] = {
   skipLibCheck: true,
-  noImplicitAny: true
-}
+  noImplicitAny: true,
+};
 
 logger.info(`Using extra configuration: ${JSON.stringify(extraConfiguration)}`);
-config.options = {...config.options, ...extraConfiguration};
+config.options = { ...config.options, ...extraConfiguration };
 
 const createdFiles: Record<string, string> = {};
 const host = ts.createCompilerHost(config.options);
