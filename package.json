@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "parcel": "^2.0.1",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "license": "MIT",
+  "source": "src/main.ts",
+  "main": "dist/main.js",
+  "bin": "dist/main.js",
+  "name": "typescript_errors",
+  "scripts": {
+    "start": "ts-node src/main.ts",
+    "build": "parcel build"
+  },
+  "engines": {
+    "node": ">= 12.2.0"
+  },
+  "version": "1.0.2"
+}
