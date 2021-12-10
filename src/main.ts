@@ -4,19 +4,43 @@ import * as fs from 'fs';
 import { createRequire } from 'module';
 import * as path from 'path';
 import typescript from 'typescript';
+import winston from 'winston';
 
-const projectFile = process.env['TSCONFIG'];
-if (!projectFile) {
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'typescript_errors' },
+  transports: [
+    new winston.transports.Console({ format: winston.format.simple()),
+  ],
+});
+
+const projectFileEnv = process.env['TSCONFIG'];
+if (!projectFileEnv) {
   throw new Error(`TSCONFIG env not found.`);
 }
 
-const outputFile = process.env['OUTPUT'];
-if (!outputFile) {
+const projectFile = path.resolve(projectFileEnv);
+if(!fs.existsSync(projectFile)) {
+  throw new Error(`Project file not found: ${projectFile}`);
+}
+
+logger.info(`Using project file: ${projectFile}`);
+
+const outputFileEnv = process.env['OUTPUT'];
+if (!outputFileEnv) {
   throw new Error(`OUTPUT env not found.`);
 }
 
+const outputFile = path.resolve(outputFileEnv);
+
+logger.info(`Using output file: ${outputFile}`);
+
 const projectBase = path.dirname(projectFile);
 const ts: typeof typescript = createRequire(projectFile)('typescript');
+
+logger.info(`Using project base: ${projectBase}`);
+logger.info(`Using TS version: ${ts.version}`);
 
 const config = ts.parseJsonConfigFileContent(
   ts.readConfigFile(projectFile, ts.sys.readFile).config,
@@ -26,11 +50,17 @@ const config = ts.parseJsonConfigFileContent(
   path.basename(projectFile),
 );
 
-config.options.skipLibCheck = true;
-config.options.noImplicitAny = true;
+const extraConfiguration: typescript.ParsedCommandLine['options'] = {
+  skipLibCheck: true,
+  noImplicitAny: true
+}
+
+logger.info(`Using extra configuration: ${JSON.stringify(extraConfiguration)}`);
+config.options = {...config.options, ...extraConfiguration};
 
 const createdFiles: Record<string, string> = {};
 const host = ts.createCompilerHost(config.options);
+logger.info(`Using in-memory compilation`);
 host.writeFile = (fileName: string, contents: string) => (createdFiles[fileName] = contents);
 
 const program = ts.createProgram({
@@ -42,12 +72,13 @@ const program = ts.createProgram({
 });
 
 const emitResult = program.emit();
+logger.info(`Emitting result`);
 const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
 const relevantDiagnostics = allDiagnostics.filter(({ file }) => {
   return file && file.fileName.includes(projectBase);
 });
-
+logger.info(`Parsing diagnostics`);
 const diagnostics = relevantDiagnostics.map((diagnostic) => {
   if (diagnostic.file) {
     const { fileName } = diagnostic.file;
@@ -61,7 +92,6 @@ const diagnostics = relevantDiagnostics.map((diagnostic) => {
 });
 
 const json: Record<string, string> = {};
-
 diagnostics.forEach((diag) => {
   if (diag) {
     const relativeFileName = diag.fileName.replace(`${projectBase}/`, '');
@@ -70,4 +100,5 @@ diagnostics.forEach((diag) => {
   }
 });
 
+logger.info(`Writing output file: ${outputFile}`);
 fs.writeFileSync(outputFile, JSON.stringify(json, null, 2));

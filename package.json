@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.2",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^16.11.12",
@@ -18,7 +19,7 @@
     "build": "parcel build"
   },
   "engines": {
-    "node": ">= 12"
+    "node": ">= 12.2.0"
   },
   "version": "1.0.0"
 }
