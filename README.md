@@ -5,7 +5,7 @@ A quick-n-dirty tool to generates a JSON list of TypeScript errors from a TypeSc
 ### usage
 
 ```sh
-TSCONFIG='tsconfig.json' OUTPUT='errors.json' npx github:timkrins/typescript_errors#release
+TSCONFIG='repo/tsconfig.json' OUTPUT='errors.json' npm exec github:timkrins/typescript_errors#release
 ```
 
 ### development
