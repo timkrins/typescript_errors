@@ -61,14 +61,20 @@ const config = ts.parseJsonConfigFileContent(
   path.basename(projectFile),
 );
 
-config.options = { ...config.options, sourceMap: false, emitDecoratorMetadata: false, ...extraConfig };
+config.options = {
+  ...config.options,
+  sourceMap: false,
+  emitDecoratorMetadata: false,
+  skipLibCheck: true,
+  skipDefaultLibCheck: true,
+  ...extraConfig,
+};
 
 const host = ts.createCompilerHost(config.options);
 logger.info(`Using in-memory compilation`);
 
-host.writeFile = (fileName: string, _ignoredResult: string) => {
-  logger.info(`Compiled file: ${fileName}`);
-};
+// do absolutely nothing with the file
+host.writeFile = (_fileName: string, _ignoredResult: string) => {};
 
 const program = ts.createProgram({
   rootNames: config.fileNames,
@@ -80,6 +86,7 @@ const program = ts.createProgram({
 
 logger.info(`Compiling...`);
 const emitResult = program.emit();
+logger.info(`Compile finished.`);
 const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
 const relevantDiagnostics = allDiagnostics.filter(({ file }) => {
@@ -110,6 +117,7 @@ diagnostics.forEach((diag) => {
 logger.info(`Writing output file: ${outputFile}`);
 fs.writeFileSync(outputFile, JSON.stringify(json, null, 2));
 
-const [totalSeconds, totalNanoSeconds] = process.hrtime(startTime);
+const [seconds, nanoSeconds] = process.hrtime(startTime);
+const milliseconds = Math.round(nanoSeconds / 1000000);
 
-logger.info(`Took ${totalSeconds}.${totalNanoSeconds / 1000000} seconds: ${outputFile}`);
+logger.info(`Took ${seconds}.${milliseconds} seconds`);

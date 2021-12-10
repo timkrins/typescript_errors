@@ -5,7 +5,7 @@ A quick-n-dirty tool to generates a JSON list of TypeScript errors from a TypeSc
 ### usage
 
 ```sh
-TSCONFIG='tsconfig.json' OUTPUT='errors.json' EXTRA_CONFIG='{"skipLibCheck":true,"noImplicitAny":true}' npm exec --yes github:timkrins/typescript_errors#release
+TSCONFIG='tsconfig.json' OUTPUT='errors.json' EXTRA_CONFIG='{"noImplicitAny":true}' npm exec --yes github:timkrins/typescript_errors#release
 ```
 
 ### development
