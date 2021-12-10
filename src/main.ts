@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as fs from 'fs';
 import { createRequire } from 'module';
 import * as path from 'path';
