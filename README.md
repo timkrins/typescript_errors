@@ -1,11 +1,11 @@
 ## typescript_errors
 
-Generates a JSON list of TypeScript errors from a typescript project.
+A quick-n-dirty tool to generates a JSON list of TypeScript errors from a TypeScript project.
 
 ### usage
 
 ```sh
-TSCONFIG='/Users/tim/Code/repo/tsconfig.json' OUTPUT='errors.json' npx github:timkrins/typescript_errors#release
+TSCONFIG='tsconfig.json' OUTPUT='errors.json' npx github:timkrins/typescript_errors#release
 ```
 
 ### development
@@ -14,5 +14,5 @@ TSCONFIG='/Users/tim/Code/repo/tsconfig.json' OUTPUT='errors.json' npx github:ti
 asdf install
 yarn install
 
-TSCONFIG='/Users/tim/Code/repo/tsconfig.json' OUTPUT='errors.json' yarn start
+TSCONFIG='tsconfig.json' OUTPUT='errors.json' yarn start
 ```
