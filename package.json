@@ -1,25 +1,29 @@
 {
-  "dependencies": {
-    "winston": "^3.3.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^16.11.12",
-    "parcel": "^2.0.1",
-    "prettier": "^2.5.1",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.2"
+    "@types/node": "^18.0.0",
+    "parcel": "^2.6.2",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4",
+    "winston": "^3.7.2"
   },
   "license": "MIT",
-  "source": "src/main.ts",
-  "main": "dist/main.js",
-  "bin": "dist/main.js",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "bin": "index.js",
   "name": "typescript_errors",
   "scripts": {
-    "start": "ts-node src/main.ts",
+    "start": "ts-node src/index.ts",
     "build": "parcel build"
   },
   "engines": {
-    "node": ">= 12.2.0"
+    "node": ">= 14"
+  },
+  "targets": {
+    "main": {
+      "includeNodeModules": true
+    }
   },
   "version": "1.0.2"
 }

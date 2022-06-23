@@ -2,7 +2,7 @@ name: Release
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [main]
 
@@ -19,20 +19,33 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout build
+        uses: actions/checkout@v3
         with:
-          node-version: '16'
+          path: build
+      - name: Checkout release
+        uses: actions/checkout@v3
+        with:
+          ref: release
+          path: release
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
       - run: yarn install
+        working-directory: build
       - run: yarn build
-      - name: Release to git release branch
+        working-directory: build
+      - name: Remove existing, then copy and commit build files to release branch
+        working-directory: release
         run: |
-          COMMIT_EMAIL="$(git log --format='%ae' main | tail -n1)"
-          COMMIT_USER_NAME="$(git log --format='%an' main | tail -n1)"
-          git config --local user.email "$COMMIT_EMAIL"
-          git config --local user.name "$COMMIT_USER_NAME via Github Action"
-          git checkout --orphan release
-          git reset
-          git add -f package.json dist README.md
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git rm -rf .
+          git clean -fxd
+          cp -r $GITHUB_WORKSPACE/build/dist/index.js .
+          cp $GITHUB_WORKSPACE/build/package.json .
+          cp $GITHUB_WORKSPACE/build/README.md .
+          git add --all
           git commit -m "Release commit from Github Actions"
-          git push origin release:release --force
+          git push
