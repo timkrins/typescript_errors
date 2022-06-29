@@ -121,3 +121,8 @@ const [seconds, nanoSeconds] = process.hrtime(startTime);
 const milliseconds = Math.round(nanoSeconds / 1000000);
 
 logger.info(`Took ${seconds}.${milliseconds} seconds`);
+
+const throwOnError = process.env['THROW_ON_ERROR'];
+if (throwOnError && Object.keys(json).length > 0) {
+  throw new Error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
+}
