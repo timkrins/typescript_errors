@@ -127,6 +127,9 @@ const milliseconds = Math.round(nanoSeconds / 1000000);
 
 logger.info(`Took ${seconds}.${milliseconds} seconds`);
 
-if (throwOnError && Object.keys(json).length > 0) {
-  throw new Error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
+const anyErrors = Object.keys(json).length > 0;
+
+if (throwOnError && anyErrors) {
+  logger.error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
+  process.exit(1);
 }
