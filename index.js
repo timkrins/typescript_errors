@@ -13871,6 +13871,8 @@ const $b5e357eacdca0db3$var$projectBase = $9xlVa$path.dirname($b5e357eacdca0db3$
 const $b5e357eacdca0db3$var$ts = (0, $9xlVa$module.createRequire)($b5e357eacdca0db3$var$projectFile)("typescript");
 $b5e357eacdca0db3$var$logger.info(`Using project base: ${$b5e357eacdca0db3$var$projectBase}`);
 $b5e357eacdca0db3$var$logger.info(`Using TS version: ${$b5e357eacdca0db3$var$ts.version}`);
+const $b5e357eacdca0db3$var$throwOnError = process.env["THROW_ON_ERROR"] == "true";
+if ($b5e357eacdca0db3$var$throwOnError) $b5e357eacdca0db3$var$logger.info(`THROW_ON_ERROR is true. Execution will fail if there are any errors.`);
 const $b5e357eacdca0db3$var$config = $b5e357eacdca0db3$var$ts.parseJsonConfigFileContent($b5e357eacdca0db3$var$ts.readConfigFile($b5e357eacdca0db3$var$projectFile, $b5e357eacdca0db3$var$ts.sys.readFile).config, $b5e357eacdca0db3$var$ts.sys, $9xlVa$path.dirname($b5e357eacdca0db3$var$projectFile), undefined, $9xlVa$path.basename($b5e357eacdca0db3$var$projectFile));
 $b5e357eacdca0db3$var$config.options = {
     ...$b5e357eacdca0db3$var$config.options,
@@ -13927,8 +13929,11 @@ $9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputFile, JSON.stringify($b5e357
 const [$b5e357eacdca0db3$var$seconds, $b5e357eacdca0db3$var$nanoSeconds] = process.hrtime($b5e357eacdca0db3$var$startTime);
 const $b5e357eacdca0db3$var$milliseconds = Math.round($b5e357eacdca0db3$var$nanoSeconds / 1000000);
 $b5e357eacdca0db3$var$logger.info(`Took ${$b5e357eacdca0db3$var$seconds}.${$b5e357eacdca0db3$var$milliseconds} seconds`);
-const $b5e357eacdca0db3$var$throwOnError = process.env["THROW_ON_ERROR"];
-if ($b5e357eacdca0db3$var$throwOnError && Object.keys($b5e357eacdca0db3$var$json).length > 0) throw new Error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
+const $b5e357eacdca0db3$var$anyErrors = Object.keys($b5e357eacdca0db3$var$json).length > 0;
+if ($b5e357eacdca0db3$var$throwOnError && $b5e357eacdca0db3$var$anyErrors) {
+    $b5e357eacdca0db3$var$logger.error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
+    process.exit(1);
+}
 
 
 //# sourceMappingURL=index.js.map
