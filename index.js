@@ -13927,6 +13927,8 @@ $9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputFile, JSON.stringify($b5e357
 const [$b5e357eacdca0db3$var$seconds, $b5e357eacdca0db3$var$nanoSeconds] = process.hrtime($b5e357eacdca0db3$var$startTime);
 const $b5e357eacdca0db3$var$milliseconds = Math.round($b5e357eacdca0db3$var$nanoSeconds / 1000000);
 $b5e357eacdca0db3$var$logger.info(`Took ${$b5e357eacdca0db3$var$seconds}.${$b5e357eacdca0db3$var$milliseconds} seconds`);
+const $b5e357eacdca0db3$var$throwOnError = process.env["THROW_ON_ERROR"];
+if ($b5e357eacdca0db3$var$throwOnError && Object.keys($b5e357eacdca0db3$var$json).length > 0) throw new Error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
 
 
 //# sourceMappingURL=index.js.map
