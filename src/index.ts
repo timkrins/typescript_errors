@@ -53,6 +53,11 @@ const ts: typeof typescript = createRequire(projectFile)('typescript');
 logger.info(`Using project base: ${projectBase}`);
 logger.info(`Using TS version: ${ts.version}`);
 
+const throwOnError = process.env['THROW_ON_ERROR'] == 'true';
+if (throwOnError) {
+  logger.info(`THROW_ON_ERROR is true. Execution will fail if there are any errors.`);
+}
+
 const config = ts.parseJsonConfigFileContent(
   ts.readConfigFile(projectFile, ts.sys.readFile).config,
   ts.sys,
@@ -122,7 +127,6 @@ const milliseconds = Math.round(nanoSeconds / 1000000);
 
 logger.info(`Took ${seconds}.${milliseconds} seconds`);
 
-const throwOnError = process.env['THROW_ON_ERROR'];
 if (throwOnError && Object.keys(json).length > 0) {
   throw new Error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
 }
