@@ -21,8 +21,3 @@ yarn install
 
 TSCONFIG='tsconfig.json' OUTPUT='errors.json' yarn start
 ```
-
-If you are testing the release and don't want a cache:
-```
-THROW_ON_ERROR=true TSCONFIG='tsconfig.json' OUTPUT='ts_errors.json' npm exec --cache /tmp/empty-cache --yes github:timkrins/typescript_errors#release
-```
