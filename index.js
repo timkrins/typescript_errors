@@ -13858,19 +13858,29 @@ const $b5e357eacdca0db3$var$projectFileEnv = process.env["TSCONFIG"];
 if (!$b5e357eacdca0db3$var$projectFileEnv) throw new Error(`TSCONFIG env not found.`);
 const $b5e357eacdca0db3$var$projectFile = $9xlVa$path.resolve($b5e357eacdca0db3$var$projectFileEnv);
 if (!$9xlVa$fs.existsSync($b5e357eacdca0db3$var$projectFile)) throw new Error(`Project file not found: ${$b5e357eacdca0db3$var$projectFile}`);
-$b5e357eacdca0db3$var$logger.info(`Using project file: ${$b5e357eacdca0db3$var$projectFile}`);
+const $b5e357eacdca0db3$var$projectFileMessage = `Using project file: ${$b5e357eacdca0db3$var$projectFile}`;
+$b5e357eacdca0db3$var$logger.info($b5e357eacdca0db3$var$projectFileMessage);
 let $b5e357eacdca0db3$var$extraConfig = {};
 const $b5e357eacdca0db3$var$extraConfigEnv = process.env["EXTRA_CONFIG"];
 if ($b5e357eacdca0db3$var$extraConfigEnv) $b5e357eacdca0db3$var$extraConfig = JSON.parse($b5e357eacdca0db3$var$extraConfigEnv);
-$b5e357eacdca0db3$var$logger.info(`Using extra config: ${JSON.stringify($b5e357eacdca0db3$var$extraConfig)}`);
+const $b5e357eacdca0db3$var$extraConfigMessage = `Using extra config: ${JSON.stringify($b5e357eacdca0db3$var$extraConfig)}`;
+$b5e357eacdca0db3$var$logger.info($b5e357eacdca0db3$var$extraConfigMessage);
 const $b5e357eacdca0db3$var$outputFileEnv = process.env["OUTPUT"];
 if (!$b5e357eacdca0db3$var$outputFileEnv) throw new Error(`OUTPUT env not found.`);
 const $b5e357eacdca0db3$var$outputFile = $9xlVa$path.resolve($b5e357eacdca0db3$var$outputFileEnv);
 $b5e357eacdca0db3$var$logger.info(`Using output file: ${$b5e357eacdca0db3$var$outputFile}`);
+let $b5e357eacdca0db3$var$outputMdFile;
+const $b5e357eacdca0db3$var$outputMdFileEnv = process.env["OUTPUT_MD"];
+if ($b5e357eacdca0db3$var$outputMdFileEnv) {
+    $b5e357eacdca0db3$var$outputMdFile = $9xlVa$path.resolve($b5e357eacdca0db3$var$outputMdFileEnv);
+    $b5e357eacdca0db3$var$logger.info(`Using output md file: ${$b5e357eacdca0db3$var$outputMdFile}`);
+}
 const $b5e357eacdca0db3$var$projectBase = $9xlVa$path.dirname($b5e357eacdca0db3$var$projectFile);
 const $b5e357eacdca0db3$var$ts = (0, $9xlVa$module.createRequire)($b5e357eacdca0db3$var$projectFile)("typescript");
-$b5e357eacdca0db3$var$logger.info(`Using project base: ${$b5e357eacdca0db3$var$projectBase}`);
-$b5e357eacdca0db3$var$logger.info(`Using TS version: ${$b5e357eacdca0db3$var$ts.version}`);
+const $b5e357eacdca0db3$var$projectBaseMessage = `Using project base: ${$b5e357eacdca0db3$var$projectBase}`;
+$b5e357eacdca0db3$var$logger.info($b5e357eacdca0db3$var$projectBaseMessage);
+const $b5e357eacdca0db3$var$tsVersionMessage = `Using TS version: ${$b5e357eacdca0db3$var$ts.version}`;
+$b5e357eacdca0db3$var$logger.info($b5e357eacdca0db3$var$tsVersionMessage);
 const $b5e357eacdca0db3$var$throwOnError = process.env["THROW_ON_ERROR"] == "true";
 if ($b5e357eacdca0db3$var$throwOnError) $b5e357eacdca0db3$var$logger.info(`THROW_ON_ERROR is true. Execution will fail if there are any errors.`);
 const $b5e357eacdca0db3$var$config = $b5e357eacdca0db3$var$ts.parseJsonConfigFileContent($b5e357eacdca0db3$var$ts.readConfigFile($b5e357eacdca0db3$var$projectFile, $b5e357eacdca0db3$var$ts.sys.readFile).config, $b5e357eacdca0db3$var$ts.sys, $9xlVa$path.dirname($b5e357eacdca0db3$var$projectFile), undefined, $9xlVa$path.basename($b5e357eacdca0db3$var$projectFile));
@@ -13924,13 +13934,41 @@ $b5e357eacdca0db3$var$diagnostics.forEach((diag)=>{
         $b5e357eacdca0db3$var$json[link] = diag.message;
     }
 });
-$b5e357eacdca0db3$var$logger.info(`Writing output file: ${$b5e357eacdca0db3$var$outputFile}`);
-$9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputFile, JSON.stringify($b5e357eacdca0db3$var$json, null, 2));
 const [$b5e357eacdca0db3$var$seconds, $b5e357eacdca0db3$var$nanoSeconds] = process.hrtime($b5e357eacdca0db3$var$startTime);
 const $b5e357eacdca0db3$var$milliseconds = Math.round($b5e357eacdca0db3$var$nanoSeconds / 1000000);
 $b5e357eacdca0db3$var$logger.info(`Took ${$b5e357eacdca0db3$var$seconds}.${$b5e357eacdca0db3$var$milliseconds} seconds`);
-const $b5e357eacdca0db3$var$anyErrors = Object.keys($b5e357eacdca0db3$var$json).length > 0;
-if ($b5e357eacdca0db3$var$throwOnError && $b5e357eacdca0db3$var$anyErrors) {
+let $b5e357eacdca0db3$var$errorsMessage;
+const $b5e357eacdca0db3$var$errorCount = Object.keys($b5e357eacdca0db3$var$json).length;
+if ($b5e357eacdca0db3$var$errorCount > 0) {
+    $b5e357eacdca0db3$var$errorsMessage = `There were ${$b5e357eacdca0db3$var$errorCount} errors in the compilation`;
+    $b5e357eacdca0db3$var$logger.error($b5e357eacdca0db3$var$errorsMessage);
+}
+$b5e357eacdca0db3$var$logger.info(`Writing output file: ${$b5e357eacdca0db3$var$outputFile}`);
+$9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputFile, JSON.stringify($b5e357eacdca0db3$var$json, null, 2));
+if ($b5e357eacdca0db3$var$outputMdFile) {
+    $b5e357eacdca0db3$var$logger.info(`Writing output md file: ${$b5e357eacdca0db3$var$outputMdFile}`);
+    const errorTableContent = [];
+    Object.keys($b5e357eacdca0db3$var$json).forEach((key)=>{
+        const error = $b5e357eacdca0db3$var$json[key];
+        errorTableContent.push(`| ${key} | ${error} |`);
+    });
+    const errorTableLines = [
+        "| file | error |",
+        "| ---- | ----- |",
+        ...errorTableContent,
+        "| ---- | ----- |"
+    ];
+    const mdContent = [
+        $b5e357eacdca0db3$var$projectFileMessage,
+        $b5e357eacdca0db3$var$extraConfigMessage,
+        $b5e357eacdca0db3$var$projectBaseMessage,
+        $b5e357eacdca0db3$var$tsVersionMessage,
+        $b5e357eacdca0db3$var$errorsMessage,
+        ...errorTableLines, 
+    ].filter((m)=>!!m).join("\n");
+    $9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputMdFile, mdContent);
+}
+if ($b5e357eacdca0db3$var$throwOnError && $b5e357eacdca0db3$var$errorCount > 0) {
     $b5e357eacdca0db3$var$logger.error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
     process.exit(1);
 }
