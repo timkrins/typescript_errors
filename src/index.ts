@@ -151,7 +151,7 @@ if (outputMdFile) {
     const error = json[key];
     errorTableContent.push(`| \`${key}\` ${error} |`);
   });
-  const errorTableLines = ['| error |', '| ----- |', ...errorTableContent, '| ----- |'];
+  const errorTableLines = ['| error |', '| ----- |', ...errorTableContent];
   const mdContent = [
     projectFileMessage,
     extraConfigMessage,
