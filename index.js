@@ -13955,8 +13955,7 @@ if ($b5e357eacdca0db3$var$outputMdFile) {
     const errorTableLines = [
         "| error |",
         "| ----- |",
-        ...errorTableContent,
-        "| ----- |"
+        ...errorTableContent
     ];
     const mdContent = [
         $b5e357eacdca0db3$var$projectFileMessage,
