@@ -28,7 +28,8 @@ if (!fs.existsSync(projectFile)) {
   throw new Error(`Project file not found: ${projectFile}`);
 }
 
-logger.info(`Using project file: ${projectFile}`);
+const projectFileMessage = `Using project file: ${projectFile}`;
+logger.info(projectFileMessage);
 
 let extraConfig: typescript.ParsedCommandLine['options'] = {};
 const extraConfigEnv = process.env['EXTRA_CONFIG'];
@@ -36,7 +37,8 @@ if (extraConfigEnv) {
   extraConfig = JSON.parse(extraConfigEnv);
 }
 
-logger.info(`Using extra config: ${JSON.stringify(extraConfig)}`);
+const extraConfigMessage = `Using extra config: ${JSON.stringify(extraConfig)}`;
+logger.info(extraConfigMessage);
 
 const outputFileEnv = process.env['OUTPUT'];
 if (!outputFileEnv) {
@@ -44,14 +46,22 @@ if (!outputFileEnv) {
 }
 
 const outputFile = path.resolve(outputFileEnv);
-
 logger.info(`Using output file: ${outputFile}`);
+
+let outputMdFile: string | undefined;
+const outputMdFileEnv = process.env['OUTPUT_MD'];
+if (outputMdFileEnv) {
+  outputMdFile = path.resolve(outputMdFileEnv);
+  logger.info(`Using output md file: ${outputMdFile}`);
+}
 
 const projectBase = path.dirname(projectFile);
 const ts: typeof typescript = createRequire(projectFile)('typescript');
 
-logger.info(`Using project base: ${projectBase}`);
-logger.info(`Using TS version: ${ts.version}`);
+const projectBaseMessage = `Using project base: ${projectBase}`;
+logger.info(projectBaseMessage);
+const tsVersionMessage = `Using TS version: ${ts.version}`;
+logger.info(tsVersionMessage);
 
 const throwOnError = process.env['THROW_ON_ERROR'] == 'true';
 if (throwOnError) {
@@ -119,17 +129,43 @@ diagnostics.forEach((diag) => {
   }
 });
 
-logger.info(`Writing output file: ${outputFile}`);
-fs.writeFileSync(outputFile, JSON.stringify(json, null, 2));
-
 const [seconds, nanoSeconds] = process.hrtime(startTime);
 const milliseconds = Math.round(nanoSeconds / 1000000);
 
 logger.info(`Took ${seconds}.${milliseconds} seconds`);
 
-const anyErrors = Object.keys(json).length > 0;
+let errorsMessage: string | undefined;
+const errorCount = Object.keys(json).length;
+if (errorCount > 0) {
+  errorsMessage = `There were ${errorCount} errors in the compilation`;
+  logger.error(errorsMessage);
+}
 
-if (throwOnError && anyErrors) {
+logger.info(`Writing output file: ${outputFile}`);
+fs.writeFileSync(outputFile, JSON.stringify(json, null, 2));
+
+if (outputMdFile) {
+  logger.info(`Writing output md file: ${outputMdFile}`);
+  const errorTableContent: string[] = [];
+  Object.keys(json).forEach((key) => {
+    const error = json[key];
+    errorTableContent.push(`| ${key} | ${error} |`);
+  });
+  const errorTableLines = ['| file | error |', '| ---- | ----- |', ...errorTableContent, '| ---- | ----- |'];
+  const mdContent = [
+    projectFileMessage,
+    extraConfigMessage,
+    projectBaseMessage,
+    tsVersionMessage,
+    errorsMessage,
+    ...errorTableLines,
+  ]
+    .filter((m) => !!m)
+    .join('\n');
+  fs.writeFileSync(outputMdFile, mdContent);
+}
+
+if (throwOnError && errorCount > 0) {
   logger.error(`There were errors in the compilation, and THROW_ON_ERROR was true.`);
   process.exit(1);
 }
