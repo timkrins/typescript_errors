@@ -132,7 +132,8 @@ diagnostics.forEach((diag) => {
 const [seconds, nanoSeconds] = process.hrtime(startTime);
 const milliseconds = Math.round(nanoSeconds / 1000000);
 
-logger.info(`Took ${seconds}.${milliseconds} seconds`);
+const tookSecondsMessage = `Took ${seconds}.${milliseconds} seconds`;
+logger.info(tookSecondsMessage);
 
 let errorsMessage: string | undefined;
 const errorCount = Object.keys(json).length;
@@ -159,6 +160,7 @@ if (outputMdFile) {
     tsVersionMessage,
     errorsMessage,
     ...errorTableLines,
+    tookSecondsMessage,
   ]
     .filter((m) => !!m)
     .join('\n');
