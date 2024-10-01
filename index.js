@@ -13936,7 +13936,8 @@ $b5e357eacdca0db3$var$diagnostics.forEach((diag)=>{
 });
 const [$b5e357eacdca0db3$var$seconds, $b5e357eacdca0db3$var$nanoSeconds] = process.hrtime($b5e357eacdca0db3$var$startTime);
 const $b5e357eacdca0db3$var$milliseconds = Math.round($b5e357eacdca0db3$var$nanoSeconds / 1000000);
-$b5e357eacdca0db3$var$logger.info(`Took ${$b5e357eacdca0db3$var$seconds}.${$b5e357eacdca0db3$var$milliseconds} seconds`);
+const $b5e357eacdca0db3$var$tookSecondsMessage = `Took ${$b5e357eacdca0db3$var$seconds}.${$b5e357eacdca0db3$var$milliseconds} seconds`;
+$b5e357eacdca0db3$var$logger.info($b5e357eacdca0db3$var$tookSecondsMessage);
 let $b5e357eacdca0db3$var$errorsMessage;
 const $b5e357eacdca0db3$var$errorCount = Object.keys($b5e357eacdca0db3$var$json).length;
 if ($b5e357eacdca0db3$var$errorCount > 0) {
@@ -13963,7 +13964,8 @@ if ($b5e357eacdca0db3$var$outputMdFile) {
         $b5e357eacdca0db3$var$projectBaseMessage,
         $b5e357eacdca0db3$var$tsVersionMessage,
         $b5e357eacdca0db3$var$errorsMessage,
-        ...errorTableLines, 
+        ...errorTableLines,
+        $b5e357eacdca0db3$var$tookSecondsMessage, 
     ].filter((m)=>!!m).join("\n");
     $9xlVa$fs.writeFileSync($b5e357eacdca0db3$var$outputMdFile, mdContent);
 }
