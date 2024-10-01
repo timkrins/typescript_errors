@@ -28,7 +28,7 @@ if (!fs.existsSync(projectFile)) {
   throw new Error(`Project file not found: ${projectFile}`);
 }
 
-const projectFileMessage = `Using project file: ${projectFile}`;
+const projectFileMessage = `Using project file: \`${projectFile}\``;
 logger.info(projectFileMessage);
 
 let extraConfig: typescript.ParsedCommandLine['options'] = {};
@@ -37,7 +37,7 @@ if (extraConfigEnv) {
   extraConfig = JSON.parse(extraConfigEnv);
 }
 
-const extraConfigMessage = `Using extra config: ${JSON.stringify(extraConfig)}`;
+const extraConfigMessage = `Using extra config: \`${JSON.stringify(extraConfig)}\``;
 logger.info(extraConfigMessage);
 
 const outputFileEnv = process.env['OUTPUT'];
@@ -58,9 +58,9 @@ if (outputMdFileEnv) {
 const projectBase = path.dirname(projectFile);
 const ts: typeof typescript = createRequire(projectFile)('typescript');
 
-const projectBaseMessage = `Using project base: ${projectBase}`;
+const projectBaseMessage = `Using project base: \`${projectBase}\``;
 logger.info(projectBaseMessage);
-const tsVersionMessage = `Using TS version: ${ts.version}`;
+const tsVersionMessage = `Using TS version: \`${ts.version}\``;
 logger.info(tsVersionMessage);
 
 const throwOnError = process.env['THROW_ON_ERROR'] == 'true';
@@ -149,9 +149,9 @@ if (outputMdFile) {
   const errorTableContent: string[] = [];
   Object.keys(json).forEach((key) => {
     const error = json[key];
-    errorTableContent.push(`| ${key} | ${error} |`);
+    errorTableContent.push(`| \`${key}\` ${error} |`);
   });
-  const errorTableLines = ['| file | error |', '| ---- | ----- |', ...errorTableContent, '| ---- | ----- |'];
+  const errorTableLines = ['| error |', '| ----- |', ...errorTableContent, '| ----- |'];
   const mdContent = [
     projectFileMessage,
     extraConfigMessage,
